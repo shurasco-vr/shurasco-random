@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SlashCoVR Random Challenge</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+            radial-gradient(circle at top, #252525 0%, #0b0b0b 60%);
+        color: #fff;
+        font-family:
+            Arial,
+            "Noto Sans JP",
+            sans-serif;
+    }
+
+    .container {
+        width: min(700px, 92%);
+        margin: auto;
+        padding: 30px 0 60px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #ffcc00;
+        margin-bottom: 5px;
+        font-size: 30px;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #888;
+        margin-bottom: 30px;
+    }
+
+    .panel {
+        background: rgba(25, 25, 25, 0.96);
+        border: 1px solid #444;
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #ccc;
+    }
+
+    input {
+        width: 100%;
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #555;
+        background: #111;
+        color: white;
+        font-size: 22px;
+        text-align: center;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #ffcc00;
+    }
+
+    .pp-display {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+        margin: 10px 0 14px;
+        font-size: 14px;
+    }
+
+    .pp-label {
+        color: #aaa;
+    }
+
+    .pp-input {
+        width: 52px;
+        box-sizing: border-box;
+        padding: 4px 6px;
+        border: 1px solid #666;
+        border-radius: 6px;
+        background: #222;
+        color: #ffcc00;
+        font-size: 17px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .pp-input:focus {
+        outline: 2px solid #ff7300;
+        border-color: #ff7300;
+    }
+
+    .pp-max {
+        color: #777;
+    }
+
+    button {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        padding: 17px;
+        font-size: 21px;
+        font-weight: bold;
+        color: white;
+        background: linear-gradient(135deg, #ff4500, #ff7300);
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    button:hover {
+        transform: scale(1.02);
+        filter: brightness(1.15);
+    }
+
+    button:disabled {
+        background: #444;
+        color: #888;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .draw-area {
+        text-align: center;
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    .rolling {
+        font-size: 25px;
+        color: #ffcc00;
+        animation: pulse .15s infinite alternate;
+    }
+
+    @keyframes pulse {
+        from {
+            opacity: .4;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .park {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #222;
+        border: 1px solid #444;
+        padding: 14px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+    }
+
+    .park-name {
+        font-size: 18px;
+    }
+
+    .park-info {
+        color: #aaa;
+        font-size: 13px;
+        margin-left: 8px;
+    }
+
+    .cost {
+        color: #ffcc00;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .remaining {
+        text-align: center;
+        font-size: 23px;
+        margin-top: 18px;
+    }
+
+    .remaining span {
+        color: #ffcc00;
+        font-weight: bold;
+    }
+
+    .item-result {
+        text-align: center;
+        font-size: 27px;
+        color: #55ff88;
+        font-weight: bold;
+        padding: 25px 5px;
+    }
+
+    .final {
+        border: 2px solid #ffcc00;
+    }
+
+    .final-title {
+        text-align: center;
+        color: #ffcc00;
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .final-row {
+        margin: 9px 0;
+        padding: 11px;
+        background: #181818;
+        border-radius: 8px;
+    }
+
+    .final-park {
+        padding: 10px;
+        background: #181818;
+        border-radius: 8px;
+        margin: 6px 0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .note {
+        color: #777;
+        font-size: 13px;
+        text-align: center;
+        margin-top: 12px;
+        line-height: 1.6;
+    }
+
+    .locked-info {
+        text-align: center;
+        color: #777;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+
+    .success {
+        color: #55ff88;
+    }
+    /* FINAL RESULT HIDDEN */
+    #finalResult, .final-result, .result-section {
+        display: none !important;
+    }
+
+    .option-checkboxes {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 6px;
+        margin: 10px 0;
+    }
+
+    .option-checkboxes label {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+    }
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>🔥 SHURASCO VR 🔥</h1>
+    <div class="subtitle">RANDOM CHALLENGE GENERATOR</div>
+
+
+    <!-- =========================
+         プレイヤー設定
+    ========================== -->
+
+    <div class="panel">
+
+        <label for="level">
+            プレイヤーレベル
+        </label>
+
+        <input
+            id="level"
+            type="number"
+            min="1"
+            max="999"
+            placeholder="例：10"
+            oninput="calculatePP()"
+        >
+
+        <div style="margin: 15px 0; text-align: center;">
+            <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input
+                    id="enableAccountant"
+                    type="checkbox"
+                    checked
+                    style="width: auto; transform: scale(1.3);"
+                >
+                会計士を抽選対象にする
+            </label>
+        </div>
+
+        <div style="margin: 15px 0; text-align: center;">
+            <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input
+                    id="enableBountyHunter"
+                    type="checkbox"
+                    checked
+                    style="width: auto; transform: scale(1.3);"
+                >
+                バウンティハンターを抽選対象にする
+            </label>
+        </div>
+
+        <div style="margin: 15px 0; text-align: center;">
+            <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input
+                    id="enableBenadryl"
+                    type="checkbox"
+                    checked
+                    style="width: auto; transform: scale(1.3);"
+                >
+                ベナドリルを抽選対象にする
+            </label>
+        </div>
+
+        <div class="pp-display">
+            <span class="pp-label">使用PP：</span>
+            <input
+                id="initialPP"
+                class="pp-input"
+                type="number"
+                min="0"
+                max="15"
+                value=""
+                placeholder="自動"
+                oninput="validatePP()"
+            >
+            <span class="pp-max">/ 15</span>
+        </div>
+
+        <button
+            id="startButton"
+            onclick="startChallenge()"
+        >
+            🎲 抽選開始
+        </button>
+
+        <div class="note">
+            <br>
+            
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         パーク
+    ========================== -->
+
+    <div class="panel">
+
+        <h2>🎰 パーク</h2>
+
+        <div
+            id="drawArea"
+            class="draw-area"
+        >
+            レベルを入力して抽選開始
+        </div>
+
+        <div id="parkList"></div>
+
+        <div id="endReason" class="note"></div>
+
+        
+
+        <div class="remaining">
+            残りPP：
+            <span id="remainingPP">-</span>
+        </div>
+
+        
+
+    </div>
+
+
+    <!-- =========================
+         アイテム
+    ========================== -->
+
+    <div class="panel">
+
+        <h2>🎒 アイテム</h2>
+
+        <div
+            id="itemResult"
+            class="item-result"
+        >
+            -
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         最終結果
+    ========================== -->
+
+    <div
+        id="finalPanel"
+        class="panel final hidden"
+    >
+
+        <div class="final-title">
+            🎉 FINAL RESULT
+        </div>
+
+        <div class="final-row">
+            レベル：
+            <strong id="finalLevel"></strong>
+        </div>
+
+        <div class="final-row">
+            開始PP：
+            <strong id="finalStartPP"></strong>
+        </div>
+
+        <div class="final-row">
+            使用PP：
+            <strong id="finalUsedPP"></strong>
+        </div>
+
+        <div class="final-row">
+            残りPP：
+            <strong id="finalRemainPP"></strong>
+        </div>
+
+
+        <h3>🏆 パーク</h3>
+
+        <div id="finalParks"></div>
+
+        
+
+
+        <h3>🎒 アイテム</h3>
+
+        <div id="finalItem"></div>
+
+        
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   PARK DATA
+
+   unlock = 使用可能になる最低レベル
+   cost   = 必要PP
+
+   Wiki準拠
+========================================================= */
+
+const parks = [
+
+    /* ===== Lv1 / 1PP ===== */
+
+    {
+        name: "メカニック",
+        unlock: 1,
+        cost: 1
+    },
+
+    {
+        name: "健康",
+        unlock: 1,
+        cost: 1
+    },
+
+    {
+        name: "アドレナリン・ラッシュ",
+        unlock: 1,
+        cost: 1
+    },
+
+    {
+        name: "知覚過敏",
+        unlock: 1,
+        cost: 1
+    },
+
+    {
+        name: "沈む流し台",
+        unlock: 1,
+        cost: 1
+    },
+
+    {
+        name: "パニック・センス",
+        unlock: 1,
+        cost: 1
+    },
+
+
+    /* ===== Lv3 / 2PP ===== */
+
+    {
+        name: "メカニックII",
+        unlock: 3,
+        cost: 2
+    },
+
+    {
+        name: "バウンティハンター",
+        unlock: 3,
+        cost: 2
+    },
+
+    {
+        name: "マックナリー・ハンズ",
+        unlock: 3,
+        cost: 2
+    },
+
+    {
+        name: "スピード狂",
+        unlock: 3,
+        cost: 2
+    },
+
+    {
+        name: "影産まれ",
+        unlock: 3,
+        cost: 2
+    },
+
+    {
+        name: "大食いチャンピオン",
+        unlock: 3,
+        cost: 2
+    },
+
+
+    /* ===== Lv5 / 2PP ===== */
+
+    {
+        name: "商人",
+        unlock: 5,
+        cost: 2
+    },
+
+    {
+        name: "軽い足取り",
+        unlock: 5,
+        cost: 2
+    },
+
+    {
+        name: "健康II",
+        unlock: 5,
+        cost: 2
+    },
+
+    {
+        name: "ヘビー",
+        unlock: 5,
+        cost: 2
+    },
+
+    {
+        name: "近接遭遇",
+        unlock: 5,
+        cost: 2
+    },
+
+    {
+        name: "第一対応者",
+        unlock: 5,
+        cost: 2
+    },
+
+
+    /* ===== Lv10 / 3PP ===== */
+
+    {
+        name: "メカニックIII",
+        unlock: 10,
+        cost: 3
+    },
+
+    {
+        name: "軽い足取りII",
+        unlock: 10,
+        cost: 3
+    },
+
+    {
+        name: "バッターアップ",
+        unlock: 10,
+        cost: 3
+    },
+
+    {
+        name: "グルトン",
+        unlock: 10,
+        cost: 3
+    },
+
+    {
+        name: "会計士",
+        unlock: 10,
+        cost: 3
+    },
+
+    {
+        name: "神を騙す者",
+        unlock: 10,
+        cost: 3
+    },
+
+
+    /* ===== Lv15 / 3PP ===== */
+
+    {
+        name: "ステルス・カモフラージュ",
+        unlock: 15,
+        cost: 3
+    },
+
+    {
+        name: "ウサギの足取り",
+        unlock: 15,
+        cost: 3
+    },
+
+    {
+        name: "アスリート",
+        unlock: 15,
+        cost: 3
+    },
+
+    {
+        name: "エクスタミネーター用の懐中電灯",
+        unlock: 15,
+        cost: 3
+    },
+
+    {
+        name: "窮地",
+        unlock: 15,
+        cost: 3
+    },
+
+    {
+        name: "スケープゴート",
+        unlock: 15,
+        cost: 3
+    },
+
+
+    /* ===== Lv20 / 4PP ===== */
+
+    {
+        name: "GROUCH化",
+        unlock: 20,
+        cost: 4
+    },
+
+    {
+        name: "エクストリーム・バフ",
+        unlock: 20,
+        cost: 4
+    },
+
+    {
+        name: "バルカン・ウォリアー",
+        unlock: 20,
+        cost: 4
+    },
+
+    {
+        name: "リード・ベリー",
+        unlock: 20,
+        cost: 4
+    },
+
+    {
+        name: "ソリッド・ジョン",
+        unlock: 20,
+        cost: 4
+    },
+
+    {
+        name: "異常なドクター",
+        unlock: 20,
+        cost: 4
+    }
+];
+
+
+/* =========================================================
+   ITEM DATA
+
+   Wikiのアイテム一覧に掲載されているものを対象。
+   通常 / PATRON / EXTERMINATOR / VIP・Tester /
+   Collaboration を含む。
+========================================================= */
+
+const items = [
+
+    /* ===== 通常アイテム ===== */
+
+    "プロキシー・ロケーター",
+    "マスターロック607",
+    "ロイヤル・バーガー",
+    "クッキー",
+    "ビール樽",
+    "マヨネーズ",
+    "オレンジゼリー",
+    "コストコの冷凍ピザ",
+    "エアポート・ジャングル・ジュース",
+    "ライノ・ピル",
+    "石ころ",
+    "ラボで育てられた肉",
+    "砂の入った袋",
+    "呪われた人形",
+    "ニューポート・メンソール",
+    "赤い着色料の薬瓶",
+    "牛乳瓶",
+    "強欲な壺",
+    "死のお守り",
+    "エビル・ジョンクラー・カート",
+    "25Gのベナドリル",
+    "B-GONEソーダ",
+    "フリントの水",
+    "バルカンブースト",
+
+
+    /* ===== PATRON ITEM ===== */
+
+
+
+    /* ===== EXTERMINATOR ===== */
+
+
+
+    /* ===== VIP / Tester ===== */
+
+
+
+    /* ===== Collaboration ===== */
+
+    "Px-EMC"
+];
+
+
+/* =========================================================
+   GAME STATE
+========================================================= */
+
+let level = 0;
+
+let initialPP = 0;
+
+let remainingPP = 0;
+
+let selectedParks = [];
+
+let availableParks = [];
+
+let selectedItem = null;
+
+let gameRunning = false;
+
+
+/* =========================================================
+   PP CALCULATION
+========================================================= */
+
+function calculatePP() {
+
+    const input =
+        Number(
+            document.getElementById("level").value
+        );
+
+    const ppInput =
+        document.getElementById("initialPP");
+
+    if (!input || input < 1) {
+        ppInput.value = "";
+        return;
+    }
+
+    /*
+        2レベルにつき1PP
+        最大15PP
+    */
+    ppInput.value =
+        Math.min(
+            Math.floor(input / 2),
+            15
+        );
+}
+
+
+function validatePP() {
+
+    const ppInput =
+        document.getElementById("initialPP");
+
+    if (ppInput.value === "") {
+        return;
+    }
+
+    let pp = Number(ppInput.value);
+
+    if (pp < 0) pp = 0;
+    if (pp > 15) pp = 15;
+
+    ppInput.value = pp;
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+function startChallenge() {
+
+    if (gameRunning) {
+        return;
+    }
+
+
+    level =
+        Number(
+            document.getElementById("level").value
+        );
+
+
+    if (!level || level < 1) {
+
+        alert("プレイヤーレベルを入力してください。");
+
+        return;
+    }
+
+
+    /*
+        PP計算
+    */
+
+    const ppInput =
+        document.getElementById("initialPP");
+
+    if (ppInput.value === "") {
+        ppInput.value =
+            Math.min(
+                Math.floor(level / 2),
+                15
+            );
+    }
+
+    validatePP();
+
+    initialPP =
+        Number(ppInput.value);
+
+    remainingPP =
+        initialPP;
+
+
+    /*
+        状態リセット
+    */
+
+    selectedParks = [];
+
+    selectedItem = null;
+
+
+    /*
+        レベルで解禁されている
+        パークだけを候補にする
+    */
+
+    const enableAccountant =
+        document.getElementById("enableAccountant").checked;
+
+    const enableBountyHunter =
+        document.getElementById("enableBountyHunter").checked;
+
+    availableParks =
+        parks.filter(
+            park =>
+                park.unlock <= level &&
+                (enableAccountant || park.name !== "会計士") &&
+                (enableBountyHunter || park.name !== "バウンティハンター")
+        );
+
+
+    gameRunning = true;
+
+
+    /*
+        画面リセット
+    */
+
+    document.getElementById("parkList")
+        .innerHTML = "";
+
+    document.getElementById("itemResult")
+        .textContent = "抽選待ち";
+
+    document.getElementById("endReason")
+        .textContent = "";
+
+    document.getElementById("finalPanel")
+        .classList.add("hidden");
+
+
+    document.getElementById("startButton")
+        .disabled = true;
+
+
+    document.getElementById("remainingPP")
+        .textContent = remainingPP;
+
+
+    /*
+        PPが0ならパーク抽選を飛ばして
+        アイテムだけ決定
+    */
+
+    if (remainingPP <= 0) {
+
+        // PP=0なら、前回のパーク結果をリセット
+        const drawArea = document.getElementById("drawArea");
+        const parkList = document.getElementById("parkList");
+        const remaining = document.getElementById("remainingPP");
+        const endReason = document.getElementById("endReason");
+
+        if (drawArea) drawArea.textContent = "PPが0のためパークなし";
+        if (parkList) parkList.innerHTML = "";
+        if (remaining) remaining.textContent = "0";
+        if (endReason) endReason.textContent = "";
+
+        // アイテムだけ決定
+        finishChallenge();
+
+        return;
+    }
+
+
+    /*
+        パーク抽選開始
+    */
+
+    drawNextPark();
+}
+
+
+/* =========================================================
+   PARK DRAW
+========================================================= */
+
+function drawNextPark() {
+
+    /*
+        現在のPP以下で取得できる
+        パークだけを候補にする
+    */
+
+    const candidates =
+        availableParks.filter(
+            park =>
+                park.cost <= remainingPP
+        );
+
+
+    /*
+        もう買えるパークがない
+    */
+
+    if (candidates.length === 0) {
+
+        finishChallenge();
+
+        return;
+    }
+
+
+    const drawArea =
+        document.getElementById("drawArea");
+
+
+    drawArea.innerHTML =
+        `<div class="rolling">
+            🎰 抽選中...
+        </div>`;
+
+
+    /*
+        ガチャ演出
+    */
+
+    setTimeout(() => {
+
+        /*
+            ランダム選択
+        */
+
+        const randomIndex =
+            Math.floor(
+                Math.random() *
+                candidates.length
+            );
+
+
+        const selected =
+            candidates[randomIndex];
+
+
+        /*
+            取得
+        */
+
+        selectedParks.push(selected);
+
+
+        /*
+            PP消費
+        */
+
+        remainingPP -= selected.cost;
+
+
+        /*
+            同じパークは
+            このチャレンジでは再抽選しない
+        */
+
+        availableParks =
+            availableParks.filter(
+                park =>
+                    park.name !== selected.name
+            );
+
+
+        /*
+            結果表示
+        */
+
+        drawArea.innerHTML =
+            `<strong
+                class="success"
+                style="font-size:24px;"
+            >
+                🎉 ${selected.name}
+            </strong>`;
+
+
+        addParkToScreen(selected);
+
+
+        document.getElementById("remainingPP")
+            .textContent = remainingPP;
+
+
+        /*
+            少し間を置いて次へ
+        */
+
+        setTimeout(() => {
+
+            drawNextPark();
+
+        }, 700);
+
+    }, 900);
+}
+
+
+/* =========================================================
+   PARK DISPLAY
+========================================================= */
+
+function addParkToScreen(park) {
+
+    const list =
+        document.getElementById("parkList");
+
+
+    const div =
+        document.createElement("div");
+
+
+    div.className = "park";
+
+
+    div.innerHTML = `
+        <div>
+            <span class="park-name">
+                ${selectedParks.length}.
+                ${park.name}
+            </span>
+
+            <span class="park-info">
+                Lv${park.unlock}
+            </span>
+        </div>
+
+        <span class="cost">
+            -${park.cost} PP
+        </span>
+    `;
+
+
+    list.appendChild(div);
+}
+
+
+/* =========================================================
+   FINISH
+========================================================= */
+
+function finishChallenge() {
+
+    /*
+        ここまで来たらパーク抽選終了
+    */
+
+    const endReason =
+        document.getElementById("endReason");
+
+
+    if (remainingPP === 0) {
+
+        endReason.textContent =
+            "PPを使い切りました！";
+
+    } else {
+
+        endReason.textContent =
+            `取得可能なパークがなくなったため終了（残り${remainingPP}PP）`;
+    }
+
+
+    /*
+        アイテム抽選
+    */
+
+    drawItem();
+
+
+    /*
+        最終結果
+    */
+
+    document.getElementById("finalLevel")
+        .textContent = level;
+
+
+    document.getElementById("finalStartPP")
+        .textContent = initialPP;
+
+
+    document.getElementById("finalUsedPP")
+        .textContent =
+            initialPP - remainingPP;
+
+
+    document.getElementById("finalRemainPP")
+        .textContent =
+            remainingPP;
+
+
+    /*
+        最終パーク
+    */
+
+    const finalParks =
+        document.getElementById("finalParks");
+
+
+    finalParks.innerHTML = "";
+
+
+    selectedParks.forEach(
+        (park, index) => {
+
+            const div =
+                document.createElement("div");
+
+
+            div.className = "final-park";
+
+
+            div.textContent =
+                `${index + 1}. ${park.name}
+                　（${park.cost}PP）`;
+
+
+            finalParks.appendChild(div);
+        }
+    );
+
+
+    /*
+        最終画面表示
+    */
+
+    document.getElementById("finalPanel")
+        .classList.remove("hidden");
+
+
+    gameRunning = false;
+
+
+    document.getElementById("startButton")
+        .disabled = false;
+}
+
+
+/* =========================================================
+   ITEM DRAW
+========================================================= */
+
+function drawItem() {
+
+    const enableBenadryl =
+        document.getElementById("enableBenadryl").checked;
+
+    const availableItems =
+        items.filter(
+            item =>
+                enableBenadryl || item !== "25Gのベナドリル"
+        );
+
+    if (availableItems.length === 0) {
+
+        selectedItem = "なし";
+
+        document.getElementById("itemResult")
+            .textContent = "なし";
+
+        document.getElementById("finalItem")
+            .textContent = "なし";
+
+        return;
+    }
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            availableItems.length
+        );
+
+    selectedItem =
+        availableItems[randomIndex];
+
+    document.getElementById("itemResult")
+        .textContent =
+            selectedItem;
+
+    document.getElementById("finalItem")
+        .textContent =
+            selectedItem;
+}
+
+</script>
+
+</body>
+</html>
